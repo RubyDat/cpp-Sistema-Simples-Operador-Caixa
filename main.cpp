@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cstdlib> // Para system("clear") ou system("cls")
+#include <cstdlib>  // Para system("clear") ou system("cls")
+#include <ctime>    // Para time() e localtime()
+#include <stdio.h>  // Para sprintf() - usar .h para C++98
 
 using namespace std;
 
@@ -379,6 +381,53 @@ cin.ignore();
     } while (opcao != 0);
 }
 
+void gerarNotaFiscal(const Cliente& cliente, const vector<Produto>& carrinho, 
+                    const vector<int>& quantidades, double total) {
+    system("cls");
+    
+    // Obter data e hora atual
+    time_t agora;
+    time(&agora);  // Obter tempo atual
+    struct tm *dataHora = localtime(&agora);  // Converter para estrutura tm
+    
+    cout << "============================================\n";
+    cout << "            LOJA DE ARTIGOS WILD WEST         \n";
+    cout << "         NOTA FISCAL - CONSUMIDOR FINAL     \n";
+    cout << "============================================\n";
+    cout << "Data: " << (dataHora->tm_mday) << "/" 
+         << (dataHora->tm_mon + 1) << "/" << (dataHora->tm_year + 1900) << endl;
+    cout << "Hora: " << (dataHora->tm_hour) << ":" 
+         << (dataHora->tm_min) << ":" << (dataHora->tm_sec) << endl;
+    cout << "--------------------------------------------\n";
+    cout << "           DADOS DO CLIENTE                 \n";
+    cout << "Nome: " << cliente.nomeCliente << endl;
+    cout << "CPF: " << cliente.cpf << endl;
+    cout << "Contato: " << cliente.whatsapp << endl;
+    cout << "Email: " << cliente.email << endl;
+    cout << "--------------------------------------------\n";
+    cout << "           ITENS COMPRADOS                  \n";
+    cout << "COD. | DESCRICAO               | QTD | VALOR UNIT. | TOTAL ITEM\n";
+    cout << "-----|-------------------------|-----|------------|-----------\n";
+    
+    for (size_t i = 0; i < carrinho.size(); ++i) {
+        // Versão C++98 do printf formatado usando sprintf
+        char buffer[100];
+        sprintf(buffer, "%-4d | %-23s | %-3d | %-10.2f | %-10.2f",
+                carrinho[i].codigo,
+                carrinho[i].nomeProduto.substr(0, 23).c_str(),
+                quantidades[i],
+                carrinho[i].preco,
+                (carrinho[i].preco * quantidades[i]));
+        cout << buffer << endl;
+    }
+    
+    cout << "--------------------------------------------\n";
+    cout << "TOTAL A PAGAR: R$ " << total << endl;
+    cout << "============================================\n";
+    cout << "Obrigado pela preferencia! Volte sempre!\n";
+    cout << "============================================\n";
+}
+
 
 void venderProdutos(vector<Produto>& produtos, const vector<Cliente>& clientes) {
     system("cls");
@@ -500,11 +549,11 @@ cin.ignore();
                 continue;
             }
            
-            // Emitir nota fiscal
+            gerarNotaFiscal(cliente, carrinho, quantidades, total);
+            
             
 		cin.ignore();
     	cin.get();
-   
             break;
         } else if (opcao != 0) {
             cout << "Opcao invalida!\n";
